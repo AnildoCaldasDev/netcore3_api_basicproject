@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
+using netcore3_api_basicproject.Data;
 using netcore3_api_basicproject.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -22,32 +25,54 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<List<Category>>> Get()
+        public async Task<ActionResult<List<Category>>> Get([FromServices] DataContext context)
         {
-            return new List<Category>();
+            var categories = await context.Categories.AsNoTracking().ToListAsync();
+            return Ok(categories);
         }
 
 
         [HttpGet]
         [Route("{id:int}")]
-        public async Task<ActionResult<Category>> Get(int id) {
-            return new Category() { Id = id, Title = "teste" };
+        public async Task<ActionResult<Category>> Get(int id, [FromServices] DataContext context) {
+            var category = await context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+
+            if (category == null)
+                return NotFound(new { message = "Categoria não encontrada" });
+
+            return Ok(category);
         }
 
 
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult<List<Category>>> Post([FromBody] Category model)
+        public async Task<ActionResult<List<Category>>> Post(
+                                                        [FromBody] Category model,
+                                                        [FromServices]DataContext context)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(model);
+            try
+            {
+                context.Categories.Add(model);
+                await context.SaveChangesAsync();
+                return Ok(model);
+            }
+            catch
+            {
+                return BadRequest(new { message = "Não foi possivel inserir a categoria" });
+            }
+
+
+
         }
 
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<ActionResult<List<Category>>> Put(int id, [FromBody]Category model)
+        public async Task<ActionResult<List<Category>>> Put(int id,
+                                                            [FromBody]Category model,
+                                                            [FromServices] DataContext context)
         {
             if (id != model.Id)
                 return NotFound(new { message = "Categoria não encontrada" });
@@ -55,18 +80,46 @@ namespace netcore3_api_basicproject.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (model.Id == id)
-                 return Ok(model);
-
-            return NotFound();
+            try
+            {
+                context.Entry<Category>(model).State = EntityState.Modified;
+                await context.SaveChangesAsync();
+                return Ok(model);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new { message = "Esta categoria já foi atualizada" });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Não foi possivel atualizar a categoria" });
+            }
         }
-
 
         [HttpDelete]
         [Route("{id:int}")]
-        public async Task<ActionResult<List<Category>>> Delete(int id)
+        public async Task<ActionResult<List<Category>>> Delete(int id, [FromServices] DataContext context)
         {
-            return Ok();
+
+            var category = await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+            if (category == null)
+                return NotFound(new { message = "Categoria não encontrada" });
+
+            try
+            {
+
+                context.Categories.Remove(category);
+                await context.SaveChangesAsync();
+                return Ok(new { message = "Categoria removida com sucesso!"});
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new { message = "Esta categoria já foi removida" });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Não foi possivel remover a categoria" });
+            }
         }
     }
 }
