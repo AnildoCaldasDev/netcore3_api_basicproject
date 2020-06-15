@@ -27,6 +27,9 @@ namespace netcore3_api_basicproject.Controllers
         [HttpGet]
         [Route("")]
         [AllowAnonymous]
+        [ResponseCache(VaryByHeader = "User-Agent", Location = ResponseCacheLocation.Any, Duration = 30 )]
+        //remove o cache individualmente, caso use o cache no config do startup
+        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<ActionResult<List<Category>>> Get([FromServices] DataContext context)
         {
             var categories = await context.Categories.AsNoTracking().ToListAsync();
