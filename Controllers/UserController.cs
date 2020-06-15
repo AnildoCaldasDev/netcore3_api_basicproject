@@ -24,10 +24,15 @@ namespace netcore3_api_basicproject.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(model);
 
+            model.Role = "Employee";
+
             try
             {
                 context.Users.Add(model);
                 await context.SaveChangesAsync();
+
+                model.Password = "";
+
                 return Ok(model);
 
             }
@@ -53,6 +58,8 @@ namespace netcore3_api_basicproject.Controllers
                 return NotFound(new { message = "Usuário ou senha inválidos!" });
 
             var token = TokenService.GenerateToken(model);
+
+            model.Password = "";
 
             return Ok(new { user = user, token = token });
 

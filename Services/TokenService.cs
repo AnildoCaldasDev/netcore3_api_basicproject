@@ -21,7 +21,7 @@ namespace netcore3_api_basicproject.Services
             {
                 Subject = new ClaimsIdentity(new Claim[] {
 
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.Username.ToString()),
                     new Claim(ClaimTypes.Role, user.Role)
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),
