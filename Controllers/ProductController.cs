@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace netcore3_api_basicproject.Controllers
 {
-    [Route("products")]
+    [Route("v1/products")]
     public class ProductController : ControllerBase
     {
 

@@ -20,7 +20,7 @@ namespace netcore3_api_basicproject.Controllers
     //[Route("api/[controller]")]
     //[ApiController]
 
-    [Route("categories")]
+    [Route("v1/categories")]
     public class CategoryController : ControllerBase
     {
 

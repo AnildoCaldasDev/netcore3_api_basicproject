@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace netcore3_api_basicproject.Controllers
 {
-    [Route("users")]
+    [Route("v1/users")]
     public class UserController : ControllerBase
     {
         [HttpPost]
