@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using netcore3_api_basicproject.Data;
@@ -16,6 +17,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpGet]
         [Route("")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Product>>> Get([FromServices] DataContext context)
         {
 
@@ -31,6 +33,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpGet]
         [Route("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<Product>> GetById([FromServices] DataContext context, int id)
         {
             var product = await context.
@@ -49,6 +52,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpGet]//products/categories/1 -----> trará todos os produtos da categoria 1
         [Route("categories/{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Product>>> GetByCategory([FromServices] DataContext context, int id)
         {
             var products = await context.
@@ -60,9 +64,9 @@ namespace netcore3_api_basicproject.Controllers
             return Ok(products);
         }
 
-
         [HttpPost]
         [Route("")]
+        [Authorize(Roles = "Manager")]
         public async Task<ActionResult<Product>> Post([FromServices] DataContext context, [FromBody] Product model)
         {
             if (!ModelState.IsValid)
@@ -80,9 +84,9 @@ namespace netcore3_api_basicproject.Controllers
             }
         }
 
-
         [HttpPut]
         [Route("{id:int}")]
+        [Authorize(Roles = "Manager")]
         public async Task<ActionResult<Product>> Put(int id, [FromBody] Product model, [FromServices] DataContext context)
         {
             if (id != model.Id)
@@ -107,9 +111,9 @@ namespace netcore3_api_basicproject.Controllers
             }
         }
 
-
         [HttpDelete]
         [Route("{id:int}")]
+        [Authorize(Roles = "Manager")]
         public async Task<ActionResult<Product>> Delete(int id, [FromServices] DataContext context)
         {
             var product = await context.Products.FirstOrDefaultAsync(x => x.Id == id);
@@ -132,7 +136,5 @@ namespace netcore3_api_basicproject.Controllers
                 return BadRequest(new { message = "Não foi possivel remover o produto" });
             }
         }
-
-
     }
 }

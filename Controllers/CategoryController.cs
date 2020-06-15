@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using netcore3_api_basicproject.Data;
@@ -25,6 +26,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpGet]
         [Route("")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Category>>> Get([FromServices] DataContext context)
         {
             var categories = await context.Categories.AsNoTracking().ToListAsync();
@@ -34,6 +36,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpGet]
         [Route("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<Category>> Get(int id, [FromServices] DataContext context) {
             var category = await context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
@@ -46,9 +49,9 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult<Category>> Post(
-                                                        [FromBody] Category model,
-                                                        [FromServices]DataContext context)
+        [Authorize(Roles = "Manager")]
+        public async Task<ActionResult<Category>> Post([FromBody] Category model,
+                                                       [FromServices]DataContext context)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -70,6 +73,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
+        [Authorize(Roles = "Manager")]
         public async Task<ActionResult<Category>> Put(int id,
                                                             [FromBody]Category model,
                                                             [FromServices] DataContext context)
@@ -98,6 +102,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
+        [Authorize(Roles = "Manager")]
         public async Task<ActionResult<Category>> Delete(int id, [FromServices] DataContext context)
         {
 
