@@ -11,7 +11,7 @@ namespace netcore3_api_basicproject.Models
         [Required(ErrorMessage = "Este campo é obrigatório")]
         [MaxLength(60, ErrorMessage = "Deve conter entre 3 e 60 caracteres")]
         [MinLength(3, ErrorMessage = "Deve conter no minimo 3 caracteres")]
-        public string Ttile { get; set; }
+        public string Title { get; set; }
 
         [MaxLength(1024, ErrorMessage = "Deve conter no maximo 1024 caracteres")]
         public string Description { get; set; }
@@ -22,7 +22,7 @@ namespace netcore3_api_basicproject.Models
 
         [Required(ErrorMessage = "Este campo é obrigatório")]
         [Range(1, int.MaxValue, ErrorMessage = "Categoria Inválida")]
-        public double CategoryId { get; set; }
+        public int CategoryId { get; set; }
 
         public Category Category { get; set; }
     }

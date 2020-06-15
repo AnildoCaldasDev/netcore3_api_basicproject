@@ -46,7 +46,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult<List<Category>>> Post(
+        public async Task<ActionResult<Category>> Post(
                                                         [FromBody] Category model,
                                                         [FromServices]DataContext context)
         {
@@ -70,7 +70,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<ActionResult<List<Category>>> Put(int id,
+        public async Task<ActionResult<Category>> Put(int id,
                                                             [FromBody]Category model,
                                                             [FromServices] DataContext context)
         {
@@ -98,7 +98,7 @@ namespace netcore3_api_basicproject.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
-        public async Task<ActionResult<List<Category>>> Delete(int id, [FromServices] DataContext context)
+        public async Task<ActionResult<Category>> Delete(int id, [FromServices] DataContext context)
         {
 
             var category = await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
