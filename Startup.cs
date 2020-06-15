@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using netcore3_api_basicproject.Data;
 using System.Linq;
 using System.Text;
+using Microsoft.OpenApi.Models;
 
 namespace netcore3_api_basicproject
 {
@@ -26,12 +27,15 @@ namespace netcore3_api_basicproject
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddCors();
+
             services.AddResponseCompression(options =>
             {
                 options.Providers.Add<GzipCompressionProvider>();
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
             });
 
+            //add cache to all API. Be aware to use this.
             //services.AddResponseCaching();
 
 
@@ -60,6 +64,9 @@ namespace netcore3_api_basicproject
             //services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
             services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
             services.AddScoped<DataContext, DataContext>();
+
+            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiNetCore Info", Version = "v1" }); });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,7 +79,22 @@ namespace netcore3_api_basicproject
 
             app.UseHttpsRedirection();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api Net Core V1");
+            });
+            //https://localhost:5001/swagger/v1/swagger.json  api json pelo postman
+            //https://localhost:5001/swagger/index.html    api grafica pelo browser.
+
+
             app.UseRouting();
+
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+            );
 
             app.UseAuthentication();
 
