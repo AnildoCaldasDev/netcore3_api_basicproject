@@ -24,13 +24,21 @@ namespace netcore3_api_basicproject.Controllers
     public class CategoryController : ControllerBase
     {
 
+        private readonly DataContext context;
+
+        public CategoryController(DataContext _context)
+        {
+            this.context = _context;
+        }
+
+
         [HttpGet]
         [Route("")]
         [AllowAnonymous]
         [ResponseCache(VaryByHeader = "User-Agent", Location = ResponseCacheLocation.Any, Duration = 30 )]
         //remove o cache individualmente, caso use o cache no config do startup
         //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public async Task<ActionResult<List<Category>>> Get([FromServices] DataContext context)
+        public async Task<ActionResult<List<Category>>> Get()
         {
             var categories = await context.Categories.AsNoTracking().ToListAsync();
             return Ok(categories);
@@ -40,7 +48,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpGet]
         [Route("{id:int}")]
         [AllowAnonymous]
-        public async Task<ActionResult<Category>> Get(int id, [FromServices] DataContext context) {
+        public async Task<ActionResult<Category>> Get(int id) {
             var category = await context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
             if (category == null)
@@ -53,8 +61,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpPost]
         [Route("")]
         [Authorize(Roles = "Manager")]
-        public async Task<ActionResult<Category>> Post([FromBody] Category model,
-                                                       [FromServices]DataContext context)
+        public async Task<ActionResult<Category>> Post([FromBody] Category model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -77,9 +84,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpPut]
         [Route("{id:int}")]
         [Authorize(Roles = "Manager")]
-        public async Task<ActionResult<Category>> Put(int id,
-                                                            [FromBody]Category model,
-                                                            [FromServices] DataContext context)
+        public async Task<ActionResult<Category>> Put(int id, [FromBody]Category model)
         {
             if (id != model.Id)
                 return NotFound(new { message = "Categoria não encontrada" });
@@ -106,7 +111,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpDelete]
         [Route("{id:int}")]
         [Authorize(Roles = "Manager")]
-        public async Task<ActionResult<Category>> Delete(int id, [FromServices] DataContext context)
+        public async Task<ActionResult<Category>> Delete(int id)
         {
 
             var category = await context.Categories.FirstOrDefaultAsync(x => x.Id == id);

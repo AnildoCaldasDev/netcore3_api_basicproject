@@ -15,10 +15,17 @@ namespace netcore3_api_basicproject.Controllers
     public class ProductController : ControllerBase
     {
 
+        private readonly DataContext context;
+
+        public ProductController(DataContext _context)
+        {
+            this.context = _context;
+        }
+
         [HttpGet]
         [Route("")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<Product>>> Get([FromServices] DataContext context)
+        public async Task<ActionResult<List<Product>>> Get()
         {
 
             var products = await context.
@@ -34,7 +41,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpGet]
         [Route("{id:int}")]
         [AllowAnonymous]
-        public async Task<ActionResult<Product>> GetById([FromServices] DataContext context, int id)
+        public async Task<ActionResult<Product>> GetById(int id)
         {
             var product = await context.
                                    Products.
@@ -53,7 +60,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpGet]//products/categories/1 -----> trará todos os produtos da categoria 1
         [Route("categories/{id:int}")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<Product>>> GetByCategory([FromServices] DataContext context, int id)
+        public async Task<ActionResult<List<Product>>> GetByCategory(int id)
         {
             var products = await context.
                                    Products.
@@ -67,7 +74,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpPost]
         [Route("")]
         [Authorize(Roles = "Manager")]
-        public async Task<ActionResult<Product>> Post([FromServices] DataContext context, [FromBody] Product model)
+        public async Task<ActionResult<Product>> Post([FromBody] Product model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -87,7 +94,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpPut]
         [Route("{id:int}")]
         [Authorize(Roles = "Manager")]
-        public async Task<ActionResult<Product>> Put(int id, [FromBody] Product model, [FromServices] DataContext context)
+        public async Task<ActionResult<Product>> Put(int id, [FromBody] Product model)
         {
             if (id != model.Id)
                 return NotFound(new { message = "Produto não encontrado" });
@@ -114,7 +121,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpDelete]
         [Route("{id:int}")]
         [Authorize(Roles = "Manager")]
-        public async Task<ActionResult<Product>> Delete(int id, [FromServices] DataContext context)
+        public async Task<ActionResult<Product>> Delete(int id)
         {
             var product = await context.Products.FirstOrDefaultAsync(x => x.Id == id);
 

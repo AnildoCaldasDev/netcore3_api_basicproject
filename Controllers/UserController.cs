@@ -15,10 +15,17 @@ namespace netcore3_api_basicproject.Controllers
     [Route("v1/users")]
     public class UserController : ControllerBase
     {
+        private readonly DataContext context;
+
+        public UserController(DataContext _context)
+        {
+            this.context = _context;
+        }
+
         [HttpPost]
         [Route("")]
         [AllowAnonymous]
-        public async Task<ActionResult<User>> Post([FromServices] DataContext context, [FromBody] User model)
+        public async Task<ActionResult<User>> Post([FromBody] User model)
         {
 
             if (!ModelState.IsValid)
@@ -46,7 +53,7 @@ namespace netcore3_api_basicproject.Controllers
         [HttpPost]
         [Route("login")]
         [AllowAnonymous]
-        public async Task<ActionResult<dynamic>> Authenticate([FromServices] DataContext context, [FromBody] User model)
+        public async Task<ActionResult<dynamic>> Authenticate([FromBody] User model)
         {
             var user = await context.
                                Users.
@@ -62,21 +69,17 @@ namespace netcore3_api_basicproject.Controllers
             model.Password = "";
 
             return Ok(new { user = user, token = token });
-
         }
-
-
 
         [HttpGet]
         [Route("")]
         [Authorize(Roles = "Manager")]
-        public async Task<ActionResult<List<User>>> Get([FromServices] DataContext context) {
+        public async Task<ActionResult<List<User>>> Get() {
 
             var users = await context.Users.AsNoTracking().ToListAsync();
 
             return Ok(users);
         }
-
 
         // METHODS ONLY FOR TESTS:
         //[HttpGet]
