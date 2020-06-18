@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using netcore3_api_basicproject.Data;
 using netcore3_api_basicproject.Models;
 using netcore3_api_basicproject.Services;
@@ -16,10 +17,12 @@ namespace netcore3_api_basicproject.Controllers
     public class UserController : ControllerBase
     {
         private readonly DataContext context;
+        private readonly AppSettings appSettings;
 
-        public UserController(DataContext _context)
+        public UserController(DataContext _context, IOptions<AppSettings> _appSettings)
         {
             this.context = _context;
+            this.appSettings = _appSettings.Value;
         }
 
         [HttpPost]
@@ -64,9 +67,9 @@ namespace netcore3_api_basicproject.Controllers
             if (user == null)
                 return NotFound(new { message = "Usuário ou senha inválidos!" });
 
-            var token = TokenService.GenerateToken(model);
+            var token = TokenService.GenerateToken(model, this.appSettings);
 
-            model.Password = "";
+            user.Password = "";
 
             return Ok(new { user = user, token = token });
         }
