@@ -11,6 +11,7 @@ using netcore3_api_basicproject.Data;
 using System.Linq;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using netcore3_api_basicproject.Hubs;
 
 namespace netcore3_api_basicproject
 {
@@ -48,10 +49,6 @@ namespace netcore3_api_basicproject
 
             var appSettings = appSettingsSection.Get<AppSettings>();
 
-
-
-
-
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -71,12 +68,14 @@ namespace netcore3_api_basicproject
                 };
             });
 
-
             //services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
             services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
             //services.AddScoped<DataContext, DataContext>();//ja é coberto no AddDbContext por default
 
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiNetCore Info", Version = "v1" }); });
+
+            services.AddSignalR();
+
 
         }
 
@@ -114,6 +113,7 @@ namespace netcore3_api_basicproject
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chatHub");
             });
         }
     }
